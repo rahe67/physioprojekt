@@ -4,12 +4,7 @@ import google.generativeai as genai
 # Konfiguration
 API_KEY = "AIzaSyDkdXr1jLRDRLTFXK-Agiu9fmOh-g95LE4"
 genai.configure(api_key=API_KEY)
-
-# Wir probieren erst Flash, dann Pro (Sicherheitsnetz)
-try:
-    model = genai.GenerativeModel('gemini-1.5-flash')
-except:
-    model = genai.GenerativeModel('gemini-pro')
+  model = genai.GenerativeModel('gemini-pro')
 
 
 # App Design
