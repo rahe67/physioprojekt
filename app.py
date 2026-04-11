@@ -4,7 +4,7 @@ import google.generativeai as genai
 # Konfiguration (Hier kommt DEIN Key rein)
 API_KEY = "AIzaSyDkdXr1jLRDRLTFXK-Agiu9fmOh-g95LE4"
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 # App Design
 st.set_page_config(page_title="Physio-Doku-Pro", page_icon="🩺")
