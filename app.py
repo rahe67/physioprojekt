@@ -1,41 +1,40 @@
 import streamlit as st
 import google.generativeai as genai
 
-# Konfiguration
-API_KEY = "AIzaSyDkdXr1jLRDRLTFXK-Agiu9fmOh-g95LE4"
+# Konfiguration mit deinem neuen Key
+API_KEY = "AIzaSyB5bWqpNuBG--N81rXvBclf4y7vrmC6hC8"
 genai.configure(api_key=API_KEY)
 
-# Automatischer Modell-Check
-def get_model():
-    # Wir testen die drei gängigsten Namen für deine Region
-    for name in ['gemini-1.5-flash', 'gemini-pro', 'models/gemini-pro']:
-        try:
-            m = genai.GenerativeModel(name)
-            # Kleiner Test-Aufruf
-            m.generate_content("test", generation_config={"max_output_tokens": 1})
-            return m
-        except:
-            continue
-    return None
-
-model = get_model()
+# Wir nutzen das zuverlässige Modell
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 # App Design
 st.set_page_config(page_title="Physio-Doku-Pro", page_icon="🩺")
 st.title("🩺 Physio-Doku Assistent")
+st.markdown("---")
 
-if model is None:
-    st.error("Google erreicht kein Modell. Bitte prüfe deinen API-Key im AI Studio.")
-else:
-    raw_input = st.text_area("Behandlungs-Notizen:", placeholder="z.B. Knie 8/10...")
-    
-    if st.button("Protokoll erstellen"):
-        if raw_input:
-            with st.spinner('KI arbeitet...'):
-                try:
-                    response = model.generate_content(f"Erstelle ein Physio-SOAP-Protokoll: {raw_input}")
-                    st.success(response.text)
-                except Exception as e:
-                    st.error(f"Fehler bei der Generierung: {e}")
+# Eingabe-Bereich
+st.subheader("Behandlungs-Notizen")
+st.info("Tipp: Nutze das Mikrofon-Symbol deiner Tastatur zum Diktieren!")
+raw_input = st.text_area("Was wurde heute gemacht?", placeholder="z.B. Knieschmerzen 8/10, Quadriceps gekräftigt...")
+
+if st.button("Protokoll professionell erstellen"):
+    if raw_input:
+        with st.spinner('KI erstellt das Protokoll...'):
+            try:
+                prompt = f"""
+                Du bist ein Experte für Physiotherapie-Dokumentation. 
+                Erstelle aus diesen Notizen ein sauberes SOAP-Protokoll:
+                {raw_input}
+                """
+                response = model.generate_content(prompt)
+                st.markdown("---")
+                st.subheader("Fertiger Bericht:")
+                st.success(response.text)
+            except Exception as e:
+                st.error(f"Verbindung steht, aber die KI meldet: {e}")
+    else:
+        st.error("Bitte gib zuerst ein paar Notizen ein.")
+
 
 
