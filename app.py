@@ -5,29 +5,37 @@ import google.generativeai as genai
 API_KEY = "AIzaSyDkdXr1jLRDRLTFXK-Agiu9fmOh-g95LE4"
 genai.configure(api_key=API_KEY)
 
-# Hier nehmen wir jetzt das stabile Pro-Modell
-model = genai.GenerativeModel('gemini-pro')
+# Automatischer Modell-Check
+def get_model():
+    # Wir testen die drei gängigsten Namen für deine Region
+    for name in ['gemini-1.5-flash', 'gemini-pro', 'models/gemini-pro']:
+        try:
+            m = genai.GenerativeModel(name)
+            # Kleiner Test-Aufruf
+            m.generate_content("test", generation_config={"max_output_tokens": 1})
+            return m
+        except:
+            continue
+    return None
+
+model = get_model()
 
 # App Design
 st.set_page_config(page_title="Physio-Doku-Pro", page_icon="🩺")
 st.title("🩺 Physio-Doku Assistent")
-st.markdown("---")
 
-# Eingabe-Bereich
-st.subheader("Behandlungs-Notizen")
-raw_input = st.text_area("Was wurde heute gemacht?", placeholder="z.B. Knieschmerzen 8/10, Faszien gelockert...")
+if model is None:
+    st.error("Google erreicht kein Modell. Bitte prüfe deinen API-Key im AI Studio.")
+else:
+    raw_input = st.text_area("Behandlungs-Notizen:", placeholder="z.B. Knie 8/10...")
+    
+    if st.button("Protokoll erstellen"):
+        if raw_input:
+            with st.spinner('KI arbeitet...'):
+                try:
+                    response = model.generate_content(f"Erstelle ein Physio-SOAP-Protokoll: {raw_input}")
+                    st.success(response.text)
+                except Exception as e:
+                    st.error(f"Fehler bei der Generierung: {e}")
 
-if st.button("Protokoll professionell erstellen"):
-    if raw_input:
-        with st.spinner('KI erstellt das Protokoll...'):
-            try:
-                prompt = f"Erstelle ein professionelles Physio-SOAP-Protokoll aus diesen Notizen: {raw_input}"
-                response = model.generate_content(prompt)
-                st.markdown("---")
-                st.subheader("Fertiger Bericht:")
-                st.success(response.text)
-            except Exception as e:
-                st.error(f"Fehler: {e}")
-    else:
-        st.error("Bitte gib zuerst Notizen ein.")
 
