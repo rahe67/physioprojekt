@@ -1,10 +1,16 @@
 import streamlit as st
 import google.generativeai as genai
 
-# Konfiguration (Hier kommt DEIN Key rein)
+# Konfiguration
 API_KEY = "AIzaSyDkdXr1jLRDRLTFXK-Agiu9fmOh-g95LE4"
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-pro')
+
+# Wir probieren erst Flash, dann Pro (Sicherheitsnetz)
+try:
+    model = genai.GenerativeModel('gemini-1.5-flash')
+except:
+    model = genai.GenerativeModel('gemini-pro')
+
 
 # App Design
 st.set_page_config(page_title="Physio-Doku-Pro", page_icon="🩺")
